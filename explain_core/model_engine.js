@@ -55,6 +55,7 @@ function process_incoming_data(mes) {
       dispose();
       break;
     default:
+      console.log(mes);
       send_status_message("unknown command");
   }
 }

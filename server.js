@@ -2,6 +2,10 @@
 const { Worker } = require("worker_threads");
 const fs = require("fs");
 const path = require("path");
+const ws = require("ws");
+const { SocketAddress } = require("net");
+
+let socket = {};
 
 // spin up a new worker module running a explain model
 const new_worker = new Worker("./explain_core/model_engine.js");
@@ -11,9 +15,6 @@ new_worker.on("message", (mes) => {
   switch (mes.command) {
     case "status":
       console.log("MODEL STATUS: " + mes.payload);
-      if (mes.payload == "model initialized") {
-        new_worker.postMessage({ command: "calculate", payload: 10.0 });
-      }
       break;
     case "data_ready":
       // send the data over the websocket to the client
@@ -47,3 +48,21 @@ function load_model(filename = "./normal_neonate.json") {
 }
 
 load_model();
+
+// Set up a websocket server
+const wss = new ws.WebSocketServer({ port: 3000 });
+
+wss.on("connection", function connection(ws) {
+  socket = ws;
+
+  console.log("API STATUS: websocket connection established.");
+
+  socket.on("message", function message(data) {
+    new_worker.postMessage(JSON.parse(data));
+    socket.send("Ok");
+  });
+
+  socket.on("close", function close() {
+    console.log("API STATUS: websocket connection closed.");
+  });
+});
