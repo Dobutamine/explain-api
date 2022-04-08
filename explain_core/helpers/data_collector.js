@@ -60,17 +60,6 @@ class Datacollector {
     this.collected_data = [];
   }
 
-  get_data() {
-    // save a copy of the collected data
-    this.data = { ...this.collected_data };
-
-    // clear the data buffer
-    this.clear_data();
-
-    // return the data copy
-    return this.data;
-  }
-
   clear_watchlist() {
     // first clear all data
     this.clear_data();
@@ -85,12 +74,10 @@ class Datacollector {
 
   set_sample_interval(new_interval) {
     this.sample_interval = parseFloat(new_interval);
-    console.log("sample interval changed to: ", new_interval)
   }
 
   set_update_interval(new_interval) {
     this.update_interval = parseFloat(new_interval);
-    console.log("update interval changed to: ", new_interval)
   }
 
   add_to_watchlist(property) {
@@ -106,7 +93,7 @@ class Datacollector {
     if (this._sample_interval_counter >= this.sample_interval) {
       this._sample_interval_counter = 0;
       let data_object = {
-        time: model_clock,
+        time: (model_clock).toFixed(4),
       };
       this.watch_list.forEach((parameter) => {
         const label = parameter["label"];
@@ -131,7 +118,7 @@ class Datacollector {
     this._sample_interval_counter += this.modeling_stepsize;
 
     // check the update interval
-    if (this._update_interval_counter > this.update_interval) {
+    if (this._update_interval_counter >= this.update_interval) {
       // reset the data ready counter
       this._update_interval_counter = 0;
 
@@ -139,7 +126,7 @@ class Datacollector {
       this.data = { ...this.collected_data };
 
       // clear the data buffer
-      this.clear_data();
+      this.collected_data = [];
 
       // set the data ready flag
       this.data_ready = true;
