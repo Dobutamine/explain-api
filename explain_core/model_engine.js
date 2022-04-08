@@ -30,13 +30,16 @@ const DataCollector = require("./helpers/data_collector");
 const Interface = require("./helpers/interface");
 
 // declare the realtime timer and stepsizes
-let realtime_timer
-let realtime_stepsize = 0.03
-let realtime_no_steps = 60
+let realtime_timer;
+let realtime_stepsize = 0.03;
+let realtime_no_steps = 60;
+
+let dc_sample_interval = 0.015;
+let dc_update_interval = 1.0;
 
 // current data
-let data = {}
-let hires = false
+let data = {};
+let hires = false;
 
 // define an object holding the current model state
 let current_model = {};
@@ -68,19 +71,18 @@ function process_incoming_data(mes) {
       dispose();
       break;
     case "set_rt_stepsize":
-      realtime_stepsize = mes.payload
+      realtime_stepsize = mes.payload;
       break;
     case "set_dc_sample":
-      current_model.components.datacollector.set_sample_interval(mes.payload)
+      dc_sample_interval = mes.payload;
       break;
     case "set_dc_update":
-      current_model.components.datacollector.set_update_interval(mes.payload)
+      dc_update_interval = mes.payload;
       break;
     default:
       break;
   }
 }
-
 
 // initialize the model as described in the model definition file
 function initialize(model_definition) {
@@ -121,18 +123,20 @@ function initialize(model_definition) {
       // add the model to the current model components dictionary
       current_model["components"][key] = newComponent;
     } catch (err) {
-      console.log("MODEL-ENGINE: model failed to initialize. Error: " + err)
-      
+      console.log("MODEL-ENGINE: model failed to initialize. Error: " + err);
+
       // let the parent know something went wrong
-      parentPort.postMessage({ command: "status", payload: "model error"})
+      parentPort.postMessage({ command: "status", payload: "model error" });
     }
   }
   // initialize the datacollector and the model interface
-  current_model["components"]["datacollector"] = new DataCollector(current_model);
+  current_model["components"]["datacollector"] = new DataCollector(
+    current_model
+  );
   current_model["components"]["datacollector"].init();
 
   // let the parent know that everything went well
-  parentPort.postMessage({ command: "status", payload: "model initialized"})
+  parentPort.postMessage({ command: "status", payload: "model initialized" });
 }
 
 // calculate a number of seconds of the model
@@ -149,27 +153,35 @@ function calculate(time_to_calculate) {
   current_model.components.datacollector.clear_data();
 
   // set the datalogger resolution to 15 ms
-  current_model.components.datacollector.set_sample_interval(0.015);
+  current_model.components.datacollector.set_sample_interval(
+    dc_sample_interval
+  );
 
   // set the datalogger update interval to 1 s
-  current_model.components.datacollector.set_update_interval(time_to_calculate * 10.0);
+  current_model.components.datacollector.set_update_interval(
+    time_to_calculate - dc_sample_interval
+  );
 
   for (let i = 0; i < no_needed_steps; i++) {
     const step_time = model_step();
     total_time += step_time;
   }
 
-  // get the data from the datacollector
-  data = current_model.components.datacollector.get_data()
-
   // send the data to the parent
-  parentPort.postMessage({ command: "result", payload: data })
+  parentPort.postMessage({
+    command: "result",
+    payload: current_model.components.datacollector.data,
+  });
 
   // send status report to the parent
-  console.log("MODEL-ENGINE: calculated model run finished in: " + total_time + " sec.");
-  console.log("MODEL-ENGINE: average model step in: " + (total_time / no_needed_steps) * 1000.0 + " ms.")
-
-
+  console.log(
+    "MODEL-ENGINE: calculated model run finished in: " + total_time + " sec."
+  );
+  console.log(
+    "MODEL-ENGINE: average model step in: " +
+      (total_time / no_needed_steps) * 1000.0 +
+      " ms."
+  );
 }
 
 function model_step() {
@@ -180,7 +192,7 @@ function model_step() {
   for (const model in current_model["components"]) {
     current_model["components"][model].model_step();
   }
-  
+
   // update the model clock
   current_model.model_time_total += current_model.modeling_stepsize;
 
@@ -202,12 +214,15 @@ function model_step_rt() {
     current_model.components.datacollector.data_ready = false;
 
     // send the data to the parent
-    parentPort.postMessage({ command: "result", payload: current_model.components.datacollector.data })
+    parentPort.postMessage({
+      command: "result",
+      payload: current_model.components.datacollector.data,
+    });
   }
 }
 
 function realtime_step() {
-  for (let i=0; i < realtime_no_steps; i ++) {
+  for (let i = 0; i < realtime_no_steps; i++) {
     model_step_rt();
   }
 }
@@ -215,38 +230,41 @@ function realtime_step() {
 // start the model in realtime
 function start() {
   if (realtime_timer) {
-    clearInterval(realtime_timer)
-    clearTimeout(realtime_timer)
+    clearInterval(realtime_timer);
+    clearTimeout(realtime_timer);
   }
 
   // clear the datalogger
   current_model.components.datacollector.clear_data();
 
-  realtime_stepsize = 0.03
+  // calculate the number of model steps per realtime step
+  realtime_no_steps = realtime_stepsize / current_model.modeling_stepsize;
 
-  realtime_no_steps = realtime_stepsize / current_model.modeling_stepsize
+  // set the datalogger resolution
+  current_model.components.datacollector.set_sample_interval(
+    dc_sample_interval
+  );
 
-  // set the datalogger resolution to 15 ms
-  current_model.components.datacollector.set_sample_interval(1.0);
+  // set the datalogger update interval
+  current_model.components.datacollector.set_update_interval(
+    dc_update_interval
+  );
 
-  // set the datalogger update interval to 1 s
-  current_model.components.datacollector.set_update_interval(1.0);
+  // start the timer
+  realtime_timer = setInterval(realtime_step, realtime_stepsize * 1000.0);
 
-  realtime_timer = setInterval(realtime_step, realtime_stepsize * 1000.0)
-
-  console.log("MODEL-ENGINE: realtime model started.")
+  // display message
+  console.log("MODEL-ENGINE: realtime model started.");
 }
 
 // stop the model in realtime
 function stop() {
   if (realtime_timer) {
-    clearInterval(realtime_timer)
-    clearTimeout(realtime_timer)
+    clearInterval(realtime_timer);
+    clearTimeout(realtime_timer);
   }
-  console.log("MODEL-ENGINE: realtime model stopped.")
+  console.log("MODEL-ENGINE: realtime model stopped.");
 }
 
 // destroy the model
-function dispose() {
-
-}
+function dispose() {}
