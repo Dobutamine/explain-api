@@ -29,6 +29,12 @@ const CustomModelExample = require("../custom_models/custom_model_example");
 const DataCollector = require("./helpers/data_collector");
 const Interface = require("./helpers/interface");
 
+// declare the realtime timer and stepsizes
+let realtime_timer
+let realtime_stepsize = 0.03
+let realtime_no_steps = 60
+
+
 // communication channel with parent
 parentPort.on("message", (mes) => {
   process_incoming_data(mes);
@@ -44,7 +50,8 @@ function process_incoming_data(mes) {
       calculate(mes.payload);
       break;
     case "data":
-      send_data(current_model.components.datacollector.get_data());
+      //send_data(current_model.components.datacollector.get_data());
+      break;
     case "start":
       start();
       break;
@@ -54,8 +61,17 @@ function process_incoming_data(mes) {
     case "dispose":
       dispose();
       break;
+    case "set_rt_stepsize":
+      realtime_stepsize = mes.payload
+      console.log("rt stepsize changed to: "+ mes.payload)
+      break;
+    case "set_dc_sample":
+      current_model.components.datacollector.set_sample_interval(mes.payload)
+      break;
+    case "set_dc_update":
+      current_model.components.datacollector.set_update_interval(mes.payload)
+      break;
     default:
-      console.log(mes);
       send_status_message("unknown command");
   }
 }
@@ -183,14 +199,33 @@ function model_step() {
   return (performance.now() - t0) / 1000;
 }
 
+function realtime_step() {
+  for (let i=0; i < realtime_no_steps; i ++) {
+    const step_time = model_step();
+  }
+}
+
 // start the model in realtime
 function start() {
   send_status_message("starting realtime model");
+  if (realtime_timer) {
+    clearInterval(realtime_timer)
+    clearTimeout(realtime_timer)
+  }
+
+  realtime_no_steps = realtime_stepsize / current_model.modeling_stepsize
+  realtime_timer = setInterval(realtime_step, realtime_stepsize * 1000.0)
+
+  send_status_message("realtime model started")
 }
 
 // stop the model in realtime
 function stop() {
   send_status_message("stopping realtime model");
+  if (realtime_timer) {
+    clearInterval(realtime_timer)
+    clearTimeout(realtime_timer)
+  }
 }
 
 // destroy the model

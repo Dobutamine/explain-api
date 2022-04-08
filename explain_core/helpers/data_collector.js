@@ -84,11 +84,13 @@ class Datacollector {
   }
 
   set_sample_interval(new_interval) {
-    this.sample_interval = new_interval;
+    this.sample_interval = parseFloat(new_interval);
+    console.log("sample interval changed to: ", new_interval)
   }
 
   set_update_interval(new_interval) {
-    this.update_interval = new_interval;
+    this.update_interval = parseFloat(new_interval);
+    console.log("update interval changed to: ", new_interval)
   }
 
   add_to_watchlist(property) {
@@ -142,6 +144,7 @@ class Datacollector {
       // set the data ready flag
       this.data_ready = true;
     }
+    // console.log(this._update_interval_counter)
     this._update_interval_counter += this.modeling_stepsize;
   }
 }
