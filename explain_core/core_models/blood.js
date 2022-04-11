@@ -120,10 +120,6 @@ class Blood {
           if (comp.oxy_enabled) {
             this.oxygenation(comp);
           }
-
-          if (comp.name == "AA") {
-            console.log(comp.po2 + " " + comp.pco2);
-          }
         });
 
         this.counter = 0;
