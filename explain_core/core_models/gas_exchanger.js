@@ -22,7 +22,7 @@ class Gasexchanger {
     this.comp_blood.acidbase_enabled = true;
 
     this.modeling_interval = this.model.modeling_stepsize;
-    this.initialized = True;
+    this.initialized = true;
   }
   model_step() {
     if (this.is_enabled) {
