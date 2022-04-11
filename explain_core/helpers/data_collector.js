@@ -73,10 +73,16 @@ class Datacollector {
   }
 
   set_sample_interval(new_interval) {
+    console.log(
+      "MODEL-ENGINE: datacollector sample interval set to: " + new_interval
+    );
     this.sample_interval = parseFloat(new_interval);
   }
 
   set_update_interval(new_interval) {
+    console.log(
+      "MODEL-ENGINE: datacollector update interval set to: " + new_interval
+    );
     this.update_interval = parseFloat(new_interval);
   }
 
@@ -93,7 +99,7 @@ class Datacollector {
     if (this._sample_interval_counter >= this.sample_interval) {
       this._sample_interval_counter = 0;
       let data_object = {
-        time: (model_clock).toFixed(4),
+        time: model_clock.toFixed(4),
       };
       this.watch_list.forEach((parameter) => {
         const label = parameter["label"];

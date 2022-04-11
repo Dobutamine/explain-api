@@ -34,13 +34,6 @@ let realtime_timer;
 let realtime_stepsize = 0.03;
 let realtime_no_steps = 60;
 
-let dc_sample_interval = 0.015;
-let dc_update_interval = 1.0;
-
-// current data
-let data = {};
-let hires = false;
-
 // define an object holding the current model state
 let current_model = {};
 
@@ -58,26 +51,11 @@ function process_incoming_data(mes) {
     case "calculate":
       calculate(mes.payload);
       break;
-    case "data":
-      //send_data(current_model.components.datacollector.get_data());
-      break;
     case "start":
-      start();
+      start(mes.payload);
       break;
     case "stop":
       stop();
-      break;
-    case "dispose":
-      dispose();
-      break;
-    case "set_rt_stepsize":
-      realtime_stepsize = mes.payload;
-      break;
-    case "set_dc_sample":
-      dc_sample_interval = mes.payload;
-      break;
-    case "set_dc_update":
-      dc_update_interval = mes.payload;
       break;
     default:
       break;
@@ -140,7 +118,19 @@ function initialize(model_definition) {
 }
 
 // calculate a number of seconds of the model
-function calculate(time_to_calculate) {
+function calculate(params) {
+  // get the parameters
+  const dc_sample_interval = parseFloat(params.data_sample_interval);
+  const time_to_calculate = parseFloat(
+    params.time_to_calculate + dc_sample_interval
+  );
+  current_model.components.datacollector.set_sample_interval(
+    dc_sample_interval
+  );
+  current_model.components.datacollector.set_update_interval(
+    time_to_calculate - dc_sample_interval
+  );
+
   // performance parameters
   let total_time = 0;
 
@@ -151,16 +141,6 @@ function calculate(time_to_calculate) {
 
   // clear the datalogger
   current_model.components.datacollector.clear_data();
-
-  // set the datalogger resolution to 15 ms
-  current_model.components.datacollector.set_sample_interval(
-    dc_sample_interval
-  );
-
-  // set the datalogger update interval to 1 s
-  current_model.components.datacollector.set_update_interval(
-    time_to_calculate - dc_sample_interval
-  );
 
   for (let i = 0; i < no_needed_steps; i++) {
     const step_time = model_step();
@@ -228,7 +208,16 @@ function realtime_step() {
 }
 
 // start the model in realtime
-function start() {
+function start(params) {
+  // get the parameters
+  realtime_stepsize = parseFloat(params.realtime_stepsize);
+  current_model.components.datacollector.set_sample_interval(
+    parseFloat(params.data_sample_interval)
+  );
+  current_model.components.datacollector.set_update_interval(
+    params.data_update_interval
+  );
+
   if (realtime_timer) {
     clearInterval(realtime_timer);
     clearTimeout(realtime_timer);
@@ -239,16 +228,6 @@ function start() {
 
   // calculate the number of model steps per realtime step
   realtime_no_steps = realtime_stepsize / current_model.modeling_stepsize;
-
-  // set the datalogger resolution
-  current_model.components.datacollector.set_sample_interval(
-    dc_sample_interval
-  );
-
-  // set the datalogger update interval
-  current_model.components.datacollector.set_update_interval(
-    dc_update_interval
-  );
 
   // start the timer
   realtime_timer = setInterval(realtime_step, realtime_stepsize * 1000.0);
@@ -265,6 +244,3 @@ function stop() {
   }
   console.log("MODEL-ENGINE: realtime model stopped.");
 }
-
-// destroy the model
-function dispose() {}
