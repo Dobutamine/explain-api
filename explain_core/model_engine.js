@@ -26,7 +26,7 @@ const Lymphatics = require("./core_models/lymphatics");
 const Birth = require("./core_models/birth");
 const Drugs = require("./core_models/drugs");
 const MechanicalVentilator = require("./core_models/mechanical_ventilator");
-const Pda = require("../custom_models/pda");
+const Pda = require("./core_models/pda");
 const CustomModelExample = require("../custom_models/custom_model_example");
 
 // import the helper modules
