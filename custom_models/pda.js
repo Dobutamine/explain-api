@@ -1,8 +1,11 @@
 class Pda {
   constructor(_model) {
-    this._model = _model;
+    this.model = _model;
+    this.initialized = false;
   }
-  init() {}
+  init() {
+    this.initialized = true;
+  }
   model_step() {}
 }
 
