@@ -2,4 +2,4 @@
 const Model = require("./model");
 
 // initialize a new model
-const new_model1 = new Model("normal_neonate", (port = 3000));
+const new_model = new Model("normal_neonate", (port = 3000));
