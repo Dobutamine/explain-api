@@ -12,7 +12,7 @@ class BloodCompliance {
     this.vol = 0; // holds the volume in liters
     this.u_vol = 0; // holds the unstressed volume in liters
     this.u_vol_fac = 1.0; // holds the unstressed volume factor in liters
-    this.p_atm = 0.0; // holds the atmospheric pressure
+    this.p_atm = 750.0; // holds the atmospheric pressure
     this.pres = 0; // holds the net pressure in mmHg
     this.pres_rel = 0; // holds the net pressure in mmHg
     this.recoil_pressure = 0; // holds the recoil pressure in mmHg

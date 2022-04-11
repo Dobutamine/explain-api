@@ -120,6 +120,10 @@ class Blood {
           if (comp.oxy_enabled) {
             this.oxygenation(comp);
           }
+
+          if (comp.name == "AA") {
+            console.log(comp.po2 + " " + comp.pco2);
+          }
         });
 
         this.counter = 0;
@@ -400,4 +404,5 @@ class Blood {
     return result.result; // No acceptable approximation. is found
   }
 }
+
 module.exports = Blood;
