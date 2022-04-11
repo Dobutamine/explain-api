@@ -107,11 +107,15 @@ function initialize(model_definition) {
       parentPort.postMessage({ command: "status", payload: "model error" });
     }
   }
-  // initialize the datacollector and the model interface
+  // initialize the datacollector
   current_model["components"]["datacollector"] = new DataCollector(
     current_model
   );
   current_model["components"]["datacollector"].init();
+
+  // initialize the model interface
+  current_model["components"]["interface"] = new Interface(current_model);
+  current_model["components"]["interface"].init();
 
   // let the parent know that everything went well
   parentPort.postMessage({ command: "status", payload: "model initialized" });
