@@ -91,12 +91,23 @@ class Heart {
       this.state = 0;
     }
     this.prev_state = this.state;
+
     // transfer the activation function to the heart compartments and the coronaries
-    this.model.components["RA"].varying_elastance_factor = this.aaf;
-    this.model.components["RV"].varying_elastance_factor = this.vaf;
-    this.model.components["LA"].varying_elastance_factor = this.aaf;
-    this.model.components["LV"].varying_elastance_factor = this.vaf;
-    this.model.components["COR"].varying_elastance_factor = this.vaf;
+    this.right_atrium.forEach((ra) => {
+      this.model.components[ra].varying_elastance_factor = this.aaf;
+    });
+    this.left_atrium.forEach((la) => {
+      this.model.components[la].varying_elastance_factor = this.aaf;
+    });
+    this.right_ventricle.forEach((rv) => {
+      this.model.components[rv].varying_elastance_factor = this.vaf;
+    });
+    this.left_ventricle.forEach((lv) => {
+      this.model.components[lv].varying_elastance_factor = this.vaf;
+    });
+    this.coronaries.forEach((cor) => {
+      this.model.components[cor].varying_elastance_factor = this.vaf;
+    });
   }
 }
 

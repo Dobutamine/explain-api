@@ -980,7 +980,11 @@
       "model_type": "Heart",
       "is_enabled": true,
       "activation_delay": 0,
-      "a": 2
+      "right_atrium": ["RA"],
+      "left_atrium": ["LA"],
+      "right_ventricle": ["RV"],
+      "left_ventricle": ["LV"],
+      "coronaries": ["COR"]
     },
     "ans": {
       "name": "ans",
@@ -1042,7 +1046,78 @@
       "model_type": "Blood",
       "is_enabled": true,
       "p_atm": 0,
-      "compounds": {},
+      "compounds": {
+        "to2": {
+          "conc": 9.1,
+          "unit": "mmol/l",
+          "fixed": false
+        },
+        "tco2": {
+          "conc": 24.6,
+          "unit": "mmol/l",
+          "fixed": false
+        },
+        "hemoglobin": {
+          "conc": 10.0,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "dpg": {
+          "conc": 5.0,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "albumin": {
+          "conc": 30.0,
+          "unit": "g/l",
+          "fixed": true
+        },
+        "phosphates": {
+          "conc": 1.5,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "uma": {
+          "conc": 7.2,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "sodium": {
+          "conc": 138.0,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "potassium": {
+          "conc": 4.0,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "calcium": {
+          "conc": 1.0,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "magnesium": {
+          "conc": 0.9,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "chloride": {
+          "conc": 103.0,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "urate": {
+          "conc": 0.2,
+          "unit": "mmol/l",
+          "fixed": true
+        },
+        "lactate": {
+          "conc": 1.0,
+          "unit": "mmol/l",
+          "fixed": true
+        }
+      },
       "fixed_blood_compounds": {
         "hemoglobin": 10,
         "dpg": 5.0,
@@ -1105,22 +1180,6 @@
       "breath_duration": 1,
       "targets": ["CHEST_L", "CHEST_R"]
     },
-    "mechanical_ventilator": {
-      "name": "ventilator",
-      "description": "mechanical ventilator model",
-      "model_type": "MechanicalVentilator",
-      "is_enabled": false,
-      "ventilator_mode": 0,
-      "cycling_mode": 0,
-      "max_pip": 12,
-      "peep": 3,
-      "freq": 40,
-      "t_in": 0.4,
-      "fio2": 0.21,
-      "target_tidal_volume": 0.0165,
-      "inspiratory_flow": 8,
-      "expiratory_flow": 20
-    },
     "intrathoracic_pressure": {
       "name": "itp",
       "description": "intrathoracic pressure model",
@@ -1141,6 +1200,64 @@
         "LL": 0.3,
         "RL": 0.3
       }
+    },
+    "drugs": {
+      "name": "drugs",
+      "description": "",
+      "model_type": "Drugs",
+      "is_enabled": false
+    },
+    "kidneys": {
+      "name": "kidneys",
+      "description": "",
+      "model_type": "Kidneys",
+      "is_enabled": false
+    },
+    "environment": {
+      "name": "environment",
+      "description": "",
+      "model_type": "Environment",
+      "is_enabled": false
+    },
+    "ecls": {
+      "name": "ecls",
+      "description": "",
+      "model_type": "Ecls",
+      "is_enabled": false
+    },
+    "lymphatics": {
+      "name": "lymphatics",
+      "description": "",
+      "model_type": "Lymphatics",
+      "is_enabled": false
+    },
+    "birth": {
+      "name": "birth",
+      "description": "",
+      "model_type": "Birth",
+      "is_enabled": false
+    },
+    "mechanical_ventilator": {
+      "name": "ventilator",
+      "description": "mechanical ventilator model",
+      "model_type": "MechanicalVentilator",
+      "is_enabled": false,
+      "ventilator_mode": 0,
+      "cycling_mode": 0,
+      "max_pip": 12,
+      "peep": 3,
+      "freq": 40,
+      "t_in": 0.4,
+      "fio2": 0.21,
+      "target_tidal_volume": 0.0165,
+      "inspiratory_flow": 8,
+      "expiratory_flow": 20
+    },
+    "compressions": {
+      "name": "compressions",
+      "description": "",
+      "model_type": "Compressions",
+      "is_enabled": false
     },
     "pda": {
       "name": "pda",

@@ -18,10 +18,14 @@ const IntrathoracicPressure = require("./core_models/intrathoracic_pressure");
 const Metabolism = require("./core_models/metabolism");
 const TimeVaryingElastance = require("./core_models/time_varying_elastance");
 const Valve = require("./core_models/valve");
-
-// import the custom models
-const Ecmo = require("../custom_models/ecmo");
-const MechanicalVentilator = require("../custom_models/mechanical_ventilator");
+const Ecls = require("./core_models/ecls");
+const Compressions = require("./core_models/compressions");
+const Environment = require("./core_models/environment");
+const Kidneys = require("./core_models/kidneys");
+const Lymphatics = require("./core_models/lymphatics");
+const Birth = require("./core_models/birth");
+const Drugs = require("./core_models/drugs");
+const MechanicalVentilator = require("./core_models/mechanical_ventilator");
 const Pda = require("../custom_models/pda");
 const CustomModelExample = require("../custom_models/custom_model_example");
 
