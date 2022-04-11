@@ -20,7 +20,6 @@ class Gasexchanger {
     // activate the oxygenation and acidbase capabilities of the compartments
     this.comp_blood.oxy_enabled = true;
     this.comp_blood.acidbase_enabled = true;
-
     this.modeling_interval = this.model.modeling_stepsize;
     this.initialized = true;
   }
@@ -30,6 +29,8 @@ class Gasexchanger {
     }
   }
   exchange_gas() {
+    this.comp_blood.oxy_enabled = true;
+    this.comp_blood.acidbase_enabled = true;
     // calculate the o2 and co2 flux
     this.flux_o2 =
       (this.comp_blood.po2 - this.comp_gas.po2) *
