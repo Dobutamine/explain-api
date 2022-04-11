@@ -70,7 +70,6 @@ class Blood {
 
           // set the fixed blood compounds as properties of the model component
           for (let [compound, value] of Object.entries(this.compounds)) {
-            console.log(compound);
             comp[compound] = value;
           }
 
