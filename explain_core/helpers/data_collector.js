@@ -94,6 +94,19 @@ class Datacollector {
     this.watch_list.push(property);
   }
 
+  add_to_watchlist_raw(property) {
+    this.clear_data();
+
+    let object_to_watch = {
+      label: property.label,
+      prop: property.prop,
+      model: this.model.components[property.model],
+    };
+
+    console.log(object_to_watch);
+    this.watch_list.push(object_to_watch);
+  }
+
   collect_data(model_clock) {
     // gather data with a specific dataresolution
     if (this._sample_interval_counter >= this.sample_interval) {

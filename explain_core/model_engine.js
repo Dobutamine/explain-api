@@ -209,6 +209,11 @@ function realtime_step() {
 
 // start the model in realtime
 function start(params) {
+  console.log(params.vitals);
+  params.vitals.forEach((vital) => {
+    current_model.components.datacollector.add_to_watchlist_raw(vital);
+  });
+
   // get the parameters
   realtime_stepsize = parseFloat(params.realtime_stepsize);
   current_model.components.datacollector.set_sample_interval(
