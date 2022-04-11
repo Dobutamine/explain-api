@@ -128,7 +128,116 @@ class Blood {
     }
   }
 
-  acidbase(comp) {}
+  acidbase(comp) {
+    // calculate the apparent strong ion difference (SID) in mEq/l
+    comp.sid =
+      comp.sodium +
+      comp.potassium +
+      2 * comp.calcium +
+      2 * comp.magnesium -
+      comp.chloride -
+      comp.lactate -
+      comp.urate;
+
+    // store the apparent SID
+    this.sid = comp.sid;
+
+    // get the albumin concentration in g/l
+    this.albumin = comp.albumin;
+
+    // get the inorganic phosphates concentration in mEq/l
+    this.phosphates = comp.phosphates;
+
+    // get the unmeasured anions in mEq/l
+    this.uma = comp.uma;
+
+    // get the total co2 concentration in mmol/l
+    this.tco2 = comp.tco2;
+
+    // get the hemoglobin concentration in mmol/l
+    this.hemoglobin = comp.hemoglobin;
+
+    // now try to find the hydrogen concentration at the point where the net charge of the plasma is zero within limits of the brent accuracy
+    let hp = this.brent(
+      (hp_estimate) => this.net_charge_plasma(hp_estimate),
+      this.left_hp,
+      this.right_hp,
+      this.max_iterations,
+      this.brent_accuracy
+    );
+
+    // if this hydrogen concentration is found then store it inside the compartment
+    if (hp > 0) {
+      // calculate the pH and store it inside the compartment
+      comp.ph = -Math.log10(hp / 1000);
+      // get the rest of the calculated blood gas
+      comp.pco2 = this.pco2;
+      comp.hco3 = this.hco3;
+      comp.cco2 = this.cco2;
+      comp.cco3 = this.cco3;
+      comp.be = this.be;
+    }
+  }
+  net_charge_plasma(hp_estimate) {
+    // calculate the ph based on the current hp estimate
+    let ph = -Math.log10(hp_estimate / 1000.0);
+
+    // we do know the total co2 concentration but we now have to find out the distribution of the co2 where tco2 = cco2 + hco3 + cco3
+
+    // cco2 = plasma concentration of co2 -> charge neutral
+    // hco3 = plasma concentration of bicarbonate -> charge 1-
+    // cco3 = plasma concentration of carbonate -> charge 2-
+
+    // the distribution is described by
+    // pH = pKc * HCO3 + log10(hco3 / cco2)
+    // pH = pKd + log10(cco3 / hco3)
+
+    //calculate the plasma co2 concentration based on the total co2 in the plasma, hydrogen concentration and the constants Kc and Kd
+    let cco2p =
+      this.tco2 /
+      (1.0 +
+        this.kc / hp_estimate +
+        (this.kc * this.kd) / Math.pow(hp_estimate, 2.0));
+
+    // calculate the plasma hco3(-) concentration (bicarbonate)
+    let hco3p = (this.kc * cco2p) / hp_estimate;
+
+    // calculate the plasma co3(2-) concentration (carbonate)
+    let co3p = (this.kd * hco3p) / hp_estimate;
+
+    // calculate the plasma OH(-) concentration (water dissociation)
+    let ohp = this.kw / hp_estimate;
+
+    // calculate the pco2 of the plasma
+    let pco2p = cco2p / this.alpha_co2p;
+
+    // calculate the weak acids (albumin and phosphates)
+    // Clin Biochem Rev 2009 May; 30(2): 41-54
+    let a_base =
+      this.albumin * (0.123 * ph - 0.631) +
+      this.phosphates * (0.309 * ph - 0.469);
+    // alb_base = this.albumin * (0.378 / (1.0 + math.pow(10, 7.1 - ph)))
+    // phos_base = this.phosphates / (1.0 + math.pow(10, 6.8 - ph))
+
+    // calculate the net charge of the plasma. If the netcharge is zero than the current hp_estimate is the correct one.
+    let netcharge =
+      hp_estimate + this.sid - hco3p - 2.0 * co3p - ohp - a_base - this.uma;
+
+    // calculate the base excess according to the van Slyke equation
+    this.be =
+      (hco3p - 24.4 + (2.3 * this.hemoglobin + 7.7) * (ph - 7.4)) *
+      (1.0 - 0.023 * this.hemoglobin);
+
+    // calculate the pco2 and store the plasma hco3
+    this.pco2 = pco2p;
+    this.hco3 = hco3p;
+    this.cco3 = co3p;
+    this.cco2 = cco2p;
+
+    // return the net charge to the brent function
+    return netcharge;
+  }
+
   oxygenation(comp) {
     // get the for the oxygenation independent parameters from the component
     this.to2 = comp.to2;
