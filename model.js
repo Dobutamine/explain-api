@@ -40,13 +40,18 @@ class Model {
   // API
   start_websocket_server() {
     // create a server
-    const server = createServer({
+    const httpsServer = createServer({
       cert: fs.readFileSync("./cert.pem"),
       key: fs.readFileSync("./key.pem"),
-      port: this.port,
     });
+
+    httpsServer.on("request", (req, res) => {
+      res.writeHead(200);
+      res.end("Hellow HTTPS world\n");
+    });
+
     // Set up a websocket server
-    const wss = new ws.WebSocketServer({ server });
+    const wss = new ws.WebSocketServer({ server: httpsServer });
 
     wss.on("connection", (ws) => {
       // transfer a reference to the socket
@@ -91,6 +96,8 @@ class Model {
         );
       });
     });
+
+    httpsServer.listen(this.port);
   }
 
   // WORKER INTERFACING
