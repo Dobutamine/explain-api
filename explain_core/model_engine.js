@@ -35,7 +35,7 @@ const Interface = require("./helpers/interface");
 
 // declare the realtime timer and stepsizes
 let realtime_timer;
-let realtime_stepsize = 0.03;
+let realtime_stepsize = 0.015;
 let realtime_no_steps = 60;
 
 // define an object holding the current model state
@@ -217,7 +217,6 @@ function realtime_step() {
 
 // start the model in realtime
 function start(params) {
-  console.log(params.vitals);
   params.vitals.forEach((vital) => {
     current_model.components.datacollector.add_to_watchlist_raw(vital);
   });
@@ -228,7 +227,7 @@ function start(params) {
     parseFloat(params.data_sample_interval)
   );
   current_model.components.datacollector.set_update_interval(
-    params.data_update_interval
+    parseFloat(params.data_update_interval)
   );
 
   if (realtime_timer) {
@@ -244,7 +243,6 @@ function start(params) {
 
   // start the timer
   realtime_timer = setInterval(realtime_step, realtime_stepsize * 1000.0);
-
   // display message
   console.log("MODEL-ENGINE: realtime model started.");
 }

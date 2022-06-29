@@ -87,7 +87,6 @@ class Model {
   }
 
   // WORKER INTERFACING
-
   start(payload) {
     this.worker.postMessage({
       command: "start",

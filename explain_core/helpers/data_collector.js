@@ -102,8 +102,9 @@ class Datacollector {
       prop: property.prop,
       model: this.model.components[property.model],
     };
-
-    console.log(object_to_watch);
+    console.log(
+      `MODEL-ENGINE: datacollector added ${property.model}.${property.prop} to watchlist.`
+    );
     this.watch_list.push(object_to_watch);
   }
 
