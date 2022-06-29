@@ -61,6 +61,9 @@ function process_incoming_data(mes) {
     case "stop":
       stop();
       break;
+    case "update":
+      update_model(mes.payload);
+      break;
     default:
       break;
   }
@@ -214,6 +217,8 @@ function realtime_step() {
     model_step_rt();
   }
 }
+// update model
+function update_model(params) {}
 
 // start the model in realtime
 function start(params) {

@@ -81,6 +81,9 @@ class Model {
           case "calculate":
             this.calculate(mes.payload);
             break;
+          case "update":
+            this.update_model(mes.payload);
+            break;
           default:
             console.log("unknown command: " + mes.command);
         }
@@ -118,6 +121,13 @@ class Model {
   calculate(payload) {
     this.worker.postMessage({
       command: "calculate",
+      payload: payload,
+    });
+  }
+
+  update_model(payload) {
+    this.worker.postMessage({
+      command: "update",
       payload: payload,
     });
   }
