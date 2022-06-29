@@ -1,5 +1,6 @@
 const { Worker } = require("worker_threads");
 const ws = require("ws");
+const { createServer } = require("https");
 const fs = require("fs");
 const path = require("path");
 
@@ -38,8 +39,14 @@ class Model {
 
   // API
   start_websocket_server() {
+    // create a server
+    const server = createServer({
+      cert: fs.readFileSync("./cert.pem"),
+      key: fs.readFileSync("./key.pem"),
+      port: this.port,
+    });
     // Set up a websocket server
-    const wss = new ws.WebSocketServer({ port: this.port });
+    const wss = new ws.WebSocketServer({ server });
 
     wss.on("connection", (ws) => {
       // transfer a reference to the socket
