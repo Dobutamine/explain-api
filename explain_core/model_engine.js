@@ -218,7 +218,49 @@ function realtime_step() {
   }
 }
 // update model
-function update_model(params) {}
+function update_model(params) {
+  switch (params.target) {
+    case "spont_breathing":
+      current_model["components"]["interface"].spont_breathing(params.value);
+      break;
+    case "ventilation":
+      break;
+    case "heart_function":
+      break;
+    case "heart_condition":
+      break;
+    case "svr":
+      break;
+    case "pvr":
+      break;
+    case "pda_size":
+      break;
+    case "vsd_size":
+      break;
+    case "heart_rhythm":
+      break;
+    case "fio2":
+      break;
+    case "temperature":
+      break;
+    case "chest_compressions":
+      break;
+    case "drug_infusion":
+      break;
+    case "lung_compliance":
+      break;
+    case "lung_shunt":
+      break;
+    case "upper_airway_resistance":
+      break;
+    case "lower_airway_resistance":
+      break;
+    case "pneumothorax":
+      break;
+    default:
+      break;
+  }
+}
 
 // start the model in realtime
 function start(params) {
