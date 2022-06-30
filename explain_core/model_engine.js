@@ -221,9 +221,10 @@ function realtime_step() {
 function update_model(params) {
   switch (params.target) {
     case "spont_breathing":
-      current_model["components"]["interface"].spont_breathing(params.value);
+      current_model["components"]["interface"].spont_breathing(params.settings);
       break;
     case "ventilation":
+      current_model["components"]["interface"].ventilation(params.settings);
       break;
     case "heart_function":
       break;
