@@ -53,6 +53,7 @@ class Model {
     // Set up a websocket server
     const wss = new ws.WebSocketServer({ server: httpsServer });
 
+    console.log("API-STATUS: server running on port: " + this.port);
     wss.on("connection", (ws) => {
       // transfer a reference to the socket
       this.socket = ws;
